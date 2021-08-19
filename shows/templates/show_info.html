@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{%block estilos%}
+<style>
+    body {
+        background-image: url(https://images8.alphacoders.com/105/1054256.jpg)!important;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block h1 %}View Show {{show.id}}{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+
+            <div class="col-sm-6 col-md-4 offset-md-2 offset-sm-1" id="grid1">
+                <h3>Title: {{show.title}}</h3><br>
+                <h3>Network: {{show.network.name}}</h3><br>
+                <h3>Release Date: {{show.release_date}}</h3><br>
+                <div>Description : {{show.desc}}</div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

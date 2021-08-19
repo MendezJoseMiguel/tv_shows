@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block h1 %}New Show{% endblock %}
+
+{% block content %}
+    <div class="row text-center justify-content-center">
+        {% load static %}
+        <div class="col-3 my-3 mx-5" style="opacity:0.9">
+            <form method="POST" action="/shows/create" class="row g-3 mx-3">
+                {% csrf_token %}
+                <h2 class="fs-1 text-light">Add New Show</h2>
+                <div class="col-md-6">
+                    <label for="title" class="form-label text-light">Title</label>
+                    <input type="text" class="form-control"  name="title" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="network" class="form-label text-light">Network</label>
+                    <select name="network_id" id="network_id" type="text" class="form-control input-index mx-auto">
+                        {% for network in networks %}
+                        <option value="{{network.id}}">{{network.name}}</option>
+                        {% endfor %}
+                        <option value="other">Other</option>
+                    </select>
+                    <input type="text" class="d-none" name="new_network" id="new_network" placeholder="Create New Network">
+                </div>
+                <div class="col-md-12">
+                    <label for="date" class="form-label text-light">Date</label>
+                    <input type="date" class="form-control" value="2021-08-18" name="release_date" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="description" class="form-label text-light">Description</label>
+                    <textarea type="text" class="form-control" name="desc" required></textarea>
+                </div>
+                <div class="text-center"><button type="submit" class="shadow btn btn-secondary">Create</button></div>
+            </form>
+        </div>        
+    </div>
+    <script>
+        $("#network_id").on("change", function () {
+            if ($(this).val() == "other") {
+                $("#new_network").removeClass("d-none");
+            } else {
+                $("#new_network").addClass("d-none");
+            }
+        });
+    </script>
+{% endblock %}
+

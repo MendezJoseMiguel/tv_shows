@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{%block estilos%}
+<style>
+    body {
+        background-image: url(https://t3.ftcdn.net/jpg/03/37/31/18/360_F_337311817_j4SHH60AOVxCQ5JIjAncII4KWO4aTeq2.jpg)!important;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block h1 %}All Show{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <table class="table">
+                
+                <thead>
+                    <tr>
+                        <th scope="col">Id</th>
+                        <th scope="col">Title</th>
+                        <th scope="col">Network</th>
+                        <th scope="col">Release Date</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for show in shows %}
+                    <tr>
+                        <th scope="row">{{show.id}}</th>
+                        <td>{{show.title}}</td>
+                        <td>{{show.network.name}}</td>
+                        <td>{{show.release_date}}</td>
+                        <td><a href="/shows/{{show.id}}/" class="btn btn-warning"><i class="far fa-eye"></i></a>
+                        <a href="/shows/{{show.id}}/destroy/" class="btn btn-danger far fa-trash-alt"><i></i></a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
