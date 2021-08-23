@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{%block estilos%}
+<style>
+    body {
+        background: rgb(57,8,8);
+        background: linear-gradient(90deg, rgba(57,8,8,1) 0%, rgba(9,18,121,1) 62%, rgba(13,17,152,1) 72%)!important;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block h1 %}Edit Show {{show.id}}{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+
+            <div class="col-6 my-3 mx-5" >
+                <form method="POST" action="/shows/{{show.id}}/update" class="row g-3 mx-3">
+                    {% csrf_token %}
+                    <div class="col-md-6">
+                        <label for="title" class="form-label text-light">Title</label>
+                        <input type="text" class="form-control" name="title" value="{{show.title}}">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="network" class="form-label text-light">Network</label>
+                        <select name="network_id" id="network_id" type="text" class="form-control input-index mx-auto">
+                            {% for network in networks %}
+                            <option {%if show.network_id == network.id %} selected="selected" {%endif%} value="{{network.id}}">{{network.name}}</option>
+                            {% endfor %}
+                            <option value="other">Other</option>
+                        </select>
+                        <input type="text" class="d-none" name="new_network" id="new_network" placeholder="Create New Network">
+                    </div>
+                    <div class="col-md-12">
+                        <label for="date" class="form-label text-light">Date</label>
+                        <input type="date" class="form-control" value="{{release_date}}" name="release_date">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="description" class="form-label text-light">Description</label>
+                        <textarea type="text" class="form-control" placeholder="{{show.desc}}" name="desc"></textarea>
+                    </div>
+                    <div class="text-center"><button type="submit" class="shadow btn btn-secondary">Edit</button></div>
+                </form>
+            </div>        
+        </div>
+        <script>
+            $("#network_id").on("change", function () {
+                if ($(this).val() == "other") {
+                    $("#new_network").removeClass("d-none");
+                } else {
+                    $("#new_network").addClass("d-none");
+                }
+            });
+            
+        // Acá se muestran los Toastr's
+            {% if messages %}
+                {% for message in messages %}
+                toastr.{{message.tags }}("{{ message }}")
+                {% endfor %}
+            {% endif %}  
+        
+        </script>
+        </div>
+    </div>
+{% endblock %}
