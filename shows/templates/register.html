@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-wEmeIV1mKuiNpC+IOBjI7aAzPcEZeedi5yW5f2yOq55WWLwNGmvvx4Um1vskeMj0" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" integrity="sha512-VEd+nq25CkR676O+pLBnDW09R7VQX9Mdiij052gVCp5yVH3jGtH70Ho/UUv4mJDsEdTvqRCFZg0NKGiojGnUCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="icon"  type="image/png" href="https://i1.wp.com/crystaljag.com/write-on/wp-content/uploads/2016/01/cropped-favicon512x512-1.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css" integrity="sha512-3pIirOrwegjM6erE5gPSwkUzO+3cTjpnV9lexlNZqvupR64iZBnOOTiiLPb9M36zpMScbmUNIcHUqKD47M719g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <title>{% block title %}TV Shows{% endblock %}</title>
+    
+    <link rel="stylesheet" href="{% static 'css/style2.css' %}">
+</head>
+<body>
+    <section class=" bg-image" style="background-image: url('https://mdbcdn.b-cdn.net/img/Photos/new-templates/search-box/img4.jpg');background-size: cover;">
+        <div class="mask d-flex align-items-center h-100 gradient-custom-3">
+            <div class="container ">
+                <div class="row d-flex justify-content-center align-items-center">
+                    <div class="col-6 col-md-4 col-lg-6 col-xl-5 p-3">
+                        <div class="card" style="border-radius: 15px;">
+                            <div class="card-body p-5">
+                                <h2 class="text-uppercase text-center mb-2">Create an account</h2>
+                                
+                                <form method="POST" action="/register" class="row g-3 mx-3">
+                                    {% csrf_token %}
+                                    <div class="form-outline mb-1">
+                                        <label class="form-label"  for="form3Example1cg">Your Name</label>
+                                        <input type="text" id="form3Example1cg" name="name" class="form-control form-control-lg" />
+                                    </div>
+                                    
+                                    <div class="form-outline mb-1">
+                                        <label class="form-label"  for="form3Example3cg">Your Email</label>
+                                        <input type="email" id="form3Example3cg" name="email" class="form-control form-control-lg" />
+                                    </div>
+                                    
+                                    <div class="form-outline mb-1">
+                                        <label class="form-label"  for="form3Example4cg">Password</label>
+                                        <input type="password" id="form3Example4cg" name="password" class="form-control form-control-lg" />
+                                    </div>
+                                    
+                                    <div class="form-outline mb-1">
+                                        <label class="form-label"  for="form3Example4cdg">Repeat your password</label>
+                                        <input type="password" id="form3Example4cdg" name="password_confirm" class="form-control form-control-lg" />
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-center">
+                                        <button type="submit" class="btn btn-success btn-block btn-lg gradient-custom-4 text-body">Register</button>
+                                    </div>
+                                    
+                                </form>
+                                
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-6 col-xl-5">
+                        <div class="card" style="border-radius: 15px;">
+                            <div class="card-body p-5">
+                                <h2 class="text-uppercase text-center mb-2">Login</h2>
+                                
+                                <form method="POST" action="/login" class="row g-3 mx-3">
+                                    {% csrf_token %}
+                                    <div class="form-outline mb-2">
+                                        <label class="form-label"  for="form3Example3cg">Email</label>
+                                        <input type="email" id="form3Example3cg" name="email" class="form-control form-control-lg"/>
+                                    </div>
+                                    
+                                    <div class="form-outline mb-2">
+                                        <label class="form-label"  for="form3Example4cg">Password</label>
+                                        <input type="password" id="form3Example4cg" name="password" class="form-control form-control-lg"/>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-center">
+                                        <button type="submit" class="btn btn-success btn-block btn-lg gradient-custom-4 text-body">Login</button>
+                                    </div>
+                                    
+                                </form>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            {% if messages %}
+                {% for message in messages %}
+                    toastr.{{message.tags}}("{{ message }}")
+                {% endfor %}
+            {% endif %}
+        </script>
+    </section>
+</body>
+</html>

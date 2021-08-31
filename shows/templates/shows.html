@@ -15,19 +15,19 @@
 {% block h1 %}All Show{% endblock %}
 
 {% block content %}
-    <div class="modal" tabindex="-1">
+    <div id="miModal" class="modal hide fade" tabindex="-1" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Advertencia</h5>
+                <h5 class="modal-title" id="miModal">Advertencia</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>¿Esta seguro que desea borrar el Show {{show.name}}</p>
+                <p>¿Esta seguro que desea borrar el Show?</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Exit</button>
-                <button type="button" id="modalbuttom" href="#" class="btn btn-primary">Delete</button>
+                <button type="button" id="modalbutton" href="#" class="btn btn-primary">Delete</button>
             </div>
             </div>
         </div>
@@ -57,12 +57,13 @@
                                 <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
                                 <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
                                 </svg></a>
-                            <a href="/shows/{{show.id}}/destroy" class="btn btn-danger"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-octagon-fill" viewBox="0 0 16 16">
+                                <button data-url="/shows/{{show.id}}/destroy" id="btndelete" class="btn btn-danger"> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-octagon-fill" viewBox="0 0 16 16">
                                 <path d="M11.46.146A.5.5 0 0 0 11.107 0H4.893a.5.5 0 0 0-.353.146L.146 4.54A.5.5 0 0 0 0 4.893v6.214a.5.5 0 0 0 .146.353l4.394 4.394a.5.5 0 0 0 .353.146h6.214a.5.5 0 0 0 .353-.146l4.394-4.394a.5.5 0 0 0 .146-.353V4.893a.5.5 0 0 0-.146-.353L11.46.146zm-6.106 4.5L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 1 1 .708-.708z"/>
-                                </svg></a>
-                            <a data-url="/shows/{{show.id}}/edit" id="btndelete" class="btn btn-success"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-break" viewBox="0 0 16 16">
+                                </svg></button>
+                            <a href="/shows/{{show.id}}/edit" class="btn btn-success"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-break" viewBox="0 0 16 16">
                                 <path d="M14 4.5V9h-1V4.5h-2A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v7H2V2a2 2 0 0 1 2-2h5.5L14 4.5zM13 12h1v2a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-2h1v2a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-2zM.5 10a.5.5 0 0 0 0 1h15a.5.5 0 0 0 0-1H.5z"/>
                                 </svg></a></td>
+                                
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -72,6 +73,10 @@
         </div>
     </div>
     <script>
+        $('.btn-danger').on("click",function(){
+        //funcion para que abra el modal
+        $('#miModal').modal('toggle')
+        });
         $("#btndelete").on("click",function(){
             const url=$("this").attr("data-url")
             console.log(url)

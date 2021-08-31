@@ -1,0 +1,294 @@
+models 
+
+from django.db import models
+
+
+class UsersManager(models.Manager):
+
+    def basic_validator(self, postData):
+        errors = {}
+
+        if len(postData['name']) < 4:
+            errors["name"] = "El nombre de usuario debe tener al menos 4 letras"
+        
+        if len(postData['email']) < 4:
+            errors["email"] = "El email de usuario debe tener al menos 4 letras"
+        
+        if len(postData['password']) < 6:
+            errors["password"] = "La contraseña de usuario debe tener al menos 6 letras"
+        
+        if postData['password'] != postData['password_confirm']:
+            errors["password"] = "Ambas contraseñas deben ser iguales"
+        
+        return errors
+
+
+
+
+'''
+class WizardsManager(models.Manager):
+    
+    def basic_validator(self, postData):
+        errors = {}
+
+        if len(postData['name']) < 4:
+            errors["name"] = "El nombre del Mago debe tener al menos 4 letras"
+        
+        if len(postData['house_id']) < 1:
+            errors["house_id"] = "Debe seleccionar al menos 1 casa"
+        
+        if len(postData['pet']) < 4:
+            errors["pet"] = "El nombre de la Mascota debe tener al menos 4 letras"
+        
+        try:
+            year = int(postData['year'])
+            if year < 1:
+                errors['year'] = "El año debe ser al menos 1"
+
+        except ValueError:
+            errors["year"] = "El campo 'Año' debe ser un número"
+        
+        return errors
+'''
+
+class Users(models.Model):
+    name = models.CharField(max_length=255)
+    email = models.EmailField()
+    password = models.CharField(max_length=255)
+    allowed = models.BooleanField(default=True)
+    avatar = models.URLField(
+        default='https://images.squarespace-cdn.com/content/v1/54b7b93ce4b0a3e130d5d232/1519987020970-8IQ7F6Z61LLBCX85A65S/icon.png?format=1000w'
+    )
+
+    create_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    objects = UsersManager()
+
+    def __repr__(self) -> str:
+        return f'{self.id}: {self.name}'
+
+
+
+class Houses(models.Model):
+    name = models.CharField(max_length=45)
+    color = models.CharField(max_length=45)
+
+    create_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    # wizards => Lista de Magos de esta casa
+
+
+class Wizards(models.Model):
+    name = models.CharField(max_length=45)
+    house = models.ForeignKey(Houses, related_name="wizards", on_delete = models.CASCADE)
+    pet = models.CharField(max_length=45)
+    year = models.IntegerField()
+    avatar = models.URLField(
+        default='https://partfy.com/blog/wp-content/uploads/2020/05/mejoresmagosespa%C3%B1oles-1000x550.jpg'
+    )
+
+    # spells = models.ManyToManyField(Spell, related_name='wizards')
+
+    create_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    # objects = WizardsManager()
+
+    def __repr__(self) -> str:
+        return f'{self.id}: {self.name}'
+
+views
+
+import bcrypt
+from django.shortcuts import redirect, render, HttpResponse
+from django.http import JsonResponse
+from django.contrib import messages
+from .models import Houses, Wizards, Users
+
+all_messages = []
+
+def index(request):
+    context = {
+        'saludo': 'Hola'
+    }
+    return render(request, 'index.html', context)
+
+
+def register(request):
+
+    if request.method == 'GET':
+        return render(request, 'register.html')
+
+    else:
+        # si llega por un POST, tomar valores del formulario
+        # y crear un nuevo usuario
+        name = request.POST['name']
+        email = request.POST['email']
+        password = request.POST['password']
+        password_confirm = request.POST['password_confirm']
+
+        # validar que el formulario esté correcto
+        errors = Users.objects.basic_validator(request.POST)
+        if len(errors) > 0:
+            # en este caso, hay al menos 1 error en el formulario
+            # voy a mostrarle los errores al usuario
+            for llave, mensaje_de_error in errors.items():
+                messages.error(request, mensaje_de_error)
+        
+            return redirect('/register')
+        
+        # si llegamos hasta acá, estamos seguros que ambas coinciden
+        user = Users.objects.create(
+            name=name,
+            email=email,
+            password=bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+        )
+        request.session['user'] = {
+            'id': user.id,
+            'name': user.name,
+            'email': user.email,
+            'avatar': user.avatar
+        }
+        messages.success(request, 'Usuario creado con éxito')
+        return redirect('/shows')
+
+
+def login(request):
+    email = request.POST['email']
+    password = request.POST['password']
+    try:
+        user = Users.objects.get(email=email)
+    except Users.DoesNotExist:
+        messages.error(request, 'Usuario inexistente o contraseña incorrecta')
+        return redirect('/register')
+    
+    # si llegamos acá, estamos seguros que al  menos el usuario SI existe
+    if  not bcrypt.checkpw(password.encode(), user.password.encode()): 
+        messages.error(request, 'Usuario inexistente o contraseña incorrecta')
+        return redirect('/register')
+    
+    # si llegamos hasta acá, estamos seguros que es el usuario y la contraseña está correcta
+    request.session['user'] = {
+        'id': user.id,
+        'name': user.name,
+        'email': user.email,
+        'avatar': user.avatar
+    }
+    messages.success(request, f'Hola {user.name}')
+    return redirect('/shows')
+
+
+def logout(request):
+    request.session['user'] = None
+    return redirect('/register')
+
+def shows(request):
+    wizards = Wizards.objects.all()
+    context = {
+        'wizards': wizards
+    }
+    return render(request, 'shows.html', context)
+
+
+def create(request):
+    houses = Houses.objects.all()
+
+    context = {
+        'houses': houses
+    }
+    return render(request, 'create.html', context)
+
+
+def edit(request, id):
+    if request.method == 'GET':
+        houses = Houses.objects.all()
+        wizard = Wizards.objects.get(id=id)
+
+        context = {
+            'houses': houses,
+            'wizard': wizard
+        }
+        return render(request, 'edit.html', context)
+    
+    else: # en este caso el formulario vino con cosas
+        wizard = Wizards.objects.get(id=id)
+        wizard.name = request.POST['name']
+        wizard.pet = request.POST['pet']
+        # .... cambiamos todas las cosas
+
+        wizard.save()
+        messages.success('Cambiamos un mago')
+
+        return redirect('/shows')
+         
+
+
+def destroy(request, id):
+    wizard = Wizards.objects.get(id=id)
+    wizard.delete()
+    return redirect('/shows')
+
+
+'''
+def new_show(request):
+    # primero recupero los campos del formulario
+    name = request.POST['name']
+    house_id = request.POST['house_id']
+    pet = request.POST['pet']
+    year = request.POST['year']
+
+    # luego valido que estos campos sean correctos
+    errors = Wizards.objects.basic_validator(request.POST)
+
+    if len(errors) > 0:
+        # en este caso, hay al menos 1 error en el formulario
+        # voy a mostrarle los errores al usuario
+        for llave, mensaje_de_error in errors.items():
+            messages.error(request, mensaje_de_error)
+        
+        return redirect('/shows/create')
+
+    # si llego acá, entonces el formulario está todo OK
+    wizard = Wizards.objects.create(name=name, house_id=int(house_id),
+                                    pet=pet, year=year)
+                                    
+    messages.success(request, f'El mago {name} ha sido agregado')
+
+    return redirect('/shows')
+'''
+
+from .forms import WizardForm
+
+def new_show(request):
+    # primero recupero los campos del formulario
+    name = request.POST['name']
+    house_id = request.POST['house_id']
+    pet = request.POST['pet']
+    year = request.POST['year']
+
+    # luego valido que estos campos sean correctos
+    form = WizardForm(request.POST)
+    if not form.is_valid():
+        for llave, valor in form.errors.items():
+            messages.error(request, f'{llave}: {valor[0]}')
+        return redirect('/shows/create')
+
+    # si llego acá, entonces el formulario está todo OK
+    wizard = Wizards.objects.create(name=name, house_id=int(house_id),
+                                    pet=pet, year=year)
+                                    
+    messages.success(request, f'El mago {name} ha sido agregado')
+
+    return redirect('/shows')
+
+
+
+def show(request):
+    context = {
+        'saludo': 'Hola'
+    }
+    return render(request, 'show.html', context)
+
+
